@@ -1,0 +1,196 @@
+{
+    "services" : {
+        "http" : {
+            "nmap-service-names" : [
+                "http"
+            ],
+            "nmap-service-names-ignore" : [
+                "^nacn_http$"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-http-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(http* or ssl*) and not (broadcast or dos or external or http-slowloris* or fuzzer)\" -oN \"{scandir}/{port}_http_nmap.txt\" -oX \"{scandir}/{port}_http_nmap.xml\" {address}"
+                },
+                {
+                    "tag" : "curl-index-{port} ({address})",
+                    "command" : "curl -sik {scheme}://{address}:{port}/ -m 10 -o \"{scandir}/{port}_http_index.html\""
+                },
+                {
+                    "tag" : "curl-robots-{port} ({address})",
+                    "command" : "curl -sik {scheme}://{address}:{port}/robots.txt -m 10 -o \"{scandir}/{port}_http_robots.tx\""
+                },
+                {
+                    "tag" : "whatweb-{port} ({address})",
+                    "command" : "whatweb --color=never --no-errors -a 3 -v {scheme}://{address}:{port} | tee \"{scandir}/{port}_http_whatweb.txt\""
+                },
+                {
+                    "tag" : "gobuster-common-{port} ({address})",
+                    "command" : "gobuster -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 10 -u {scheme}://{address}:{port} -e -s \"200,204,301,302,307,403,500\" -o \"{scandir}/{port}_http_gobuster_common.txt\""
+                },
+                {
+                    "tag" : "nikto-{port} ({address})",
+                    "command" : "nikto -ask=no -h {scheme}://{address}:{port}{nikto_ssl} -o \"{scandir}/{port}_http_nikto.txt\""
+                }
+            ]
+        },
+        "smtp" : {
+            "nmap-service-names" : [
+                "smtp"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-smtp-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(smtp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_smtp_nmap.txt\" -oX \"{scandir}/{port}_smtp_nmap.xml\" {address}"
+                },
+                {
+                    "tag" : "smtp-user-enum-{port} ({address})",
+                    "command" : "smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t {address} -p {port} | tee \"{scandir}/{port}_smtp_user-enum.txt\""
+                }
+            ]
+        },
+        "pop3" : {
+            "nmap-service-names" : [
+                "pop3"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-pop3-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(pop3*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_pop3_nmap.txt\" -oX \"{scandir}/{port}_pop3_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "imap" : {
+            "nmap-service-names" : [
+                "imap"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-imap-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(imap*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_imap_nmap.txt\" -oX \"{scandir}/{port}_imap_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "ftp" : {
+            "nmap-service-names" : [
+                "ftp"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-ftp-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(ftp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_ftp_nmap.txt\" -oX \"{scandir}/{port}_ftp_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "smb" : {
+            "nmap-service-names" : [
+                "smb",
+                "microsoft\\-ds",
+                "netbios"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-smb-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(nbstat or smb*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=unsafe=1 -oN \"{scandir}/{port}_smb_nmap.txt\" -oX \"{scandir}/{port}_smb_nmap.xml\" {address}"
+                },
+                {
+                    "tag" : "enum4linux-{port} ({address})",
+                    "command" : "enum4linux -a -M -l -d {address} | tee \"{scandir}/{port}_smb_enum4linux.txt\""
+                },
+                {
+                    "tag" : "nbtscan-{port} ({address})",
+                    "command" : "nbtscan -rvh {address} | tee \"{scandir}/{port}_smb_nbtscan.txt\""
+                }
+            ]
+        },
+        "mssql" : {
+            "nmap-service-names" : [
+                "mssql",
+                "ms\\-sql"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-mssql-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(ms-sql*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=mssql.instance-port={port},smsql.username-sa,mssql.password-sa -oN \"{scandir}/{port}_mssql_nmap.txt\" -oX \"{scandir}/{port}_mssql_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "mysql" : {
+            "nmap-service-names" : [
+                "mysql"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-mysql-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(mysql*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_mysql_nmap.txt\" -oX \"{scandir}/{port}_mysql_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "oracle" : {
+            "nmap-service-names" : [
+                "oracle"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-oracle-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(oracle*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_oracle_nmap.txt\" -oX \"{scandir}/{port}_oracle_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "nfs" : {
+            "nmap-service-names" : [
+                "nfs",
+                "rpcbind"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-nfs-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_nfs_nmap.txt\" -oX \"{scandir}/{port}_nfs_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "snmp" : {
+            "nmap-service-names" : [
+                "snmp"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-snmp-{port} ({address})",
+                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(snmp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_snmp_nmap.txt\" -oX \"{scandir}/{port}_snmp_nmap.xml\" {address}"
+                },
+                {
+                    "tag" : "onesixtyone-{port} ({address})",
+                    "command" : "onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt -dd -o \"{scandir}/{port}_snmp_onesixtyone.txt\" {address}"
+                },
+                {
+                    "tag" : "snmpwalk-{port} ({address})",
+                    "command" : "snmpwalk -c public -v 1 {address} | tee \"{scandir}/{port}_snmp_snmpwalk.txt\""
+                }
+            ]
+        },
+        "rdp" : {
+            "nmap-service-names" : [
+                "rdp",
+                "ms\\-wbt\\-server",
+                "ms\\-term\\-serv"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-rdp-{port} ({address})",
+                    "command" : "nmap -vv --reason -Pn -sV {nmapparams} -p {port} --script=\"(rdp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_rdp_nmap.txt\" -oX \"{scandir}/{port}_rdp_nmap.xml\" {address}"
+                }
+            ]
+        },
+        "vnc" : {
+            "nmap-service-names" : [
+                "vnc"
+            ],
+            "commands" : [
+                {
+                    "tag" : "nmap-vnc-{port} ({address})",
+                    "command" : "nmap -vv --reason -Pn -sV {nmapparams} -p {port} --script=\"(vnc* or realvnc*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=unsafe=1 -oN \"{scandir}/{port}_vnc_nmap.txt\" -oX \"{scandir}/{port}_vnc_nmap.xml\" {address}"
+                }
+            ]
+        }
+    }
+}
