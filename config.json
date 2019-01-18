@@ -10,7 +10,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-http-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(http* or ssl*) and not (broadcast or dos or external or http-slowloris* or fuzzer)\" -oN \"{scandir}/{port}_http_nmap.txt\" -oX \"{scandir}/{port}_http_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(http* or ssl*) and not (broadcast or dos or external or http-slowloris* or fuzzer)\" -oN \"{scandir}/{port}_http_nmap.txt\" -oX \"{scandir}/{port}_http_nmap.xml\" {address}"
                 },
                 {
                     "tag" : "curl-index-{port} ({address})",
@@ -41,7 +41,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-smtp-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(smtp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_smtp_nmap.txt\" -oX \"{scandir}/{port}_smtp_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(smtp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_smtp_nmap.txt\" -oX \"{scandir}/{port}_smtp_nmap.xml\" {address}"
                 },
                 {
                     "tag" : "smtp-user-enum-{port} ({address})",
@@ -56,7 +56,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-pop3-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(pop3*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_pop3_nmap.txt\" -oX \"{scandir}/{port}_pop3_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(pop3*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_pop3_nmap.txt\" -oX \"{scandir}/{port}_pop3_nmap.xml\" {address}"
                 }
             ]
         },
@@ -67,7 +67,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-imap-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(imap*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_imap_nmap.txt\" -oX \"{scandir}/{port}_imap_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(imap*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_imap_nmap.txt\" -oX \"{scandir}/{port}_imap_nmap.xml\" {address}"
                 }
             ]
         },
@@ -78,7 +78,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-ftp-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(ftp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_ftp_nmap.txt\" -oX \"{scandir}/{port}_ftp_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(ftp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_ftp_nmap.txt\" -oX \"{scandir}/{port}_ftp_nmap.xml\" {address}"
                 }
             ]
         },
@@ -91,7 +91,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-smb-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(nbstat or smb*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=unsafe=1 -oN \"{scandir}/{port}_smb_nmap.txt\" -oX \"{scandir}/{port}_smb_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(nbstat or smb*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=unsafe=1 -oN \"{scandir}/{port}_smb_nmap.txt\" -oX \"{scandir}/{port}_smb_nmap.xml\" {address}"
                 },
                 {
                     "tag" : "enum4linux-{port} ({address})",
@@ -111,7 +111,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-mssql-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(ms-sql*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=mssql.instance-port={port},smsql.username-sa,mssql.password-sa -oN \"{scandir}/{port}_mssql_nmap.txt\" -oX \"{scandir}/{port}_mssql_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(ms-sql*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=mssql.instance-port={port},smsql.username-sa,mssql.password-sa -oN \"{scandir}/{port}_mssql_nmap.txt\" -oX \"{scandir}/{port}_mssql_nmap.xml\" {address}"
                 }
             ]
         },
@@ -122,7 +122,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-mysql-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(mysql*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_mysql_nmap.txt\" -oX \"{scandir}/{port}_mysql_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(mysql*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_mysql_nmap.txt\" -oX \"{scandir}/{port}_mysql_nmap.xml\" {address}"
                 }
             ]
         },
@@ -133,7 +133,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-oracle-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(oracle*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_oracle_nmap.txt\" -oX \"{scandir}/{port}_oracle_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(oracle*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_oracle_nmap.txt\" -oX \"{scandir}/{port}_oracle_nmap.xml\" {address}"
                 }
             ]
         },
@@ -145,7 +145,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-nfs-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_nfs_nmap.txt\" -oX \"{scandir}/{port}_nfs_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_nfs_nmap.txt\" -oX \"{scandir}/{port}_nfs_nmap.xml\" {address}"
                 }
             ]
         },
@@ -156,7 +156,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-snmp-{port} ({address})",
-                    "command" : "nmap -vv --reason -sV {nmapparams} -p {port} --script=\"(snmp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_snmp_nmap.txt\" -oX \"{scandir}/{port}_snmp_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -sV {nmap_extra} -p {port} --script=\"(snmp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_snmp_nmap.txt\" -oX \"{scandir}/{port}_snmp_nmap.xml\" {address}"
                 },
                 {
                     "tag" : "onesixtyone-{port} ({address})",
@@ -177,7 +177,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-rdp-{port} ({address})",
-                    "command" : "nmap -vv --reason -Pn -sV {nmapparams} -p {port} --script=\"(rdp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_rdp_nmap.txt\" -oX \"{scandir}/{port}_rdp_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -Pn -sV {nmap_extra} -p {port} --script=\"(rdp*) and not (brute or broadcast or dos or external or fuzzer)\" -oN \"{scandir}/{port}_rdp_nmap.txt\" -oX \"{scandir}/{port}_rdp_nmap.xml\" {address}"
                 }
             ]
         },
@@ -188,7 +188,7 @@
             "commands" : [
                 {
                     "tag" : "nmap-vnc-{port} ({address})",
-                    "command" : "nmap -vv --reason -Pn -sV {nmapparams} -p {port} --script=\"(vnc* or realvnc*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=unsafe=1 -oN \"{scandir}/{port}_vnc_nmap.txt\" -oX \"{scandir}/{port}_vnc_nmap.xml\" {address}"
+                    "command" : "nmap -vv --reason -Pn -sV {nmap_extra} -p {port} --script=\"(vnc* or realvnc*) and not (brute or broadcast or dos or external or fuzzer)\" --script-args=unsafe=1 -oN \"{scandir}/{port}_vnc_nmap.txt\" -oX \"{scandir}/{port}_vnc_nmap.xml\" {address}"
                 }
             ]
         }

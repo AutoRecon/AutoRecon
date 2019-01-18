@@ -41,7 +41,7 @@ verbose     = 0
 dryrun      = False
 bruteforce  = True
 outdir      = ''
-nmapparams  = ''
+nmap        = ''
 hydraparams = ''
 parallel    = False
 hadsmb      = False
@@ -168,7 +168,7 @@ def run_cmd(cmd, tag='?', redirect=None):
 def run_nmap_quick(address):
     scandir = os.path.abspath(os.path.join(outdir, address + srvname, 'scans'))
     run_cmd(
-        e('nmap -vv --reason -sS -sV {quick_ports} --version-light {nmapparams} -oN "{scandir}/000_quick_tcp_nmap.txt" -oX "{scandir}/000_quick_tcp_nmap.xml" {address}'),
+        e('nmap -vv --reason -sS -sV {quick_ports} --version-light {nmap} -oN "{scandir}/000_quick_tcp_nmap.txt" -oX "{scandir}/000_quick_tcp_nmap.xml" {address}'),
         e('nmap-quick ({address})')
     )
     return ('run_nmap_quick', e("{scandir}/000_quick_tcp_nmap.xml"))
@@ -176,7 +176,7 @@ def run_nmap_quick(address):
 def run_nmap_tcp(address):
     scandir = os.path.abspath(os.path.join(outdir, address + srvname, 'scans'))
     run_cmd(
-        e('nmap -vv --reason -sS -A -sV -sC {tcp_ports} --osscan-guess --version-all {nmapparams} -oN "{scandir}/000_full_tcp_nmap.txt" -oX "{scandir}/000_full_tcp_nmap.xml" {address}'),
+        e('nmap -vv --reason -sS -A -sV -sC {tcp_ports} --osscan-guess --version-all {nmap} -oN "{scandir}/000_full_tcp_nmap.txt" -oX "{scandir}/000_full_tcp_nmap.xml" {address}'),
         e('nmap-tcp ({address})')
     )
     return ('run_nmap_tcp', e("{scandir}/000_full_tcp_nmap.xml"))
@@ -184,7 +184,7 @@ def run_nmap_tcp(address):
 def run_nmap_udp(address):
     scandir = os.path.abspath(os.path.join(outdir, address + srvname, 'scans'))
     run_cmd(
-        e('nmap -vv --reason -sU -A -sV -sC {udp_ports} --version-all --max-retries 1 {nmapparams} -oN "{scandir}/000_top_200_udp_nmap.txt" -oX "{scandir}/000_top_200_udp_nmap.xml" {address}'),
+        e('nmap -vv --reason -sU -A -sV -sC {udp_ports} --version-all --max-retries 1 {nmap} -oN "{scandir}/000_top_200_udp_nmap.txt" -oX "{scandir}/000_top_200_udp_nmap.xml" {address}'),
         e('nmap-udp ({address})')
     )
     return ('run_nmap_udp', e("{scandir}/000_top_200_udp_nmap.xml"))
@@ -202,9 +202,21 @@ def parse_nmap_services(report):
     return sorted(nmap_svcs, key=lambda s: s.port)
 
 def scan_service(scandir, address, port, service, tunnel):
+    global nmap
     secure = False
     if tunnel and ('ssl' in tunnel or 'tls' in tunnel):
         secure = True
+
+    # Change UDP ports back to positive values.
+    if port < 0:
+        is_udp = True
+        protocol = 'udp'
+        port *= -1
+        nmap_extra = nmap + " -sU"
+    else:
+        is_udp = False
+        protocol = 'tcp'
+        nmap_extra = nmap
 
     # Special cases for HTTP.
     scheme = 'https' if 'https' in service or 'ssl' in service or 'tls' in service or secure is True else 'http'
@@ -351,7 +363,7 @@ if __name__ == '__main__':
     disable_quick = args.disable_quick
     outdir      = args.output
     verbose     = args.verbose if args.verbose is not None else 0
-    nmapparams  = args.nmap
+    nmap  = args.nmap
     srvname     = ''
     ports       = args.ports
 
