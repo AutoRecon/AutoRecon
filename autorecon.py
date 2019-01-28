@@ -133,7 +133,7 @@ def dump_pipe(stream, stop_event=None, tag='?', color=Fore.BLUE):
         if len(line) != 0:
             debug(color + '[' + Style.BRIGHT + tag + Style.NORMAL + '] ' + Fore.RESET + '{line}', color=color)
 
-def run_cmd(cmd, tag='?', redirect=None):
+def run_cmd(cmd, host, tag='?', redirect=None):
 
     if redirect is None:
         redirect = verbose >= 2
@@ -160,32 +160,37 @@ def run_cmd(cmd, tag='?', redirect=None):
 
     if ret != 0:
         error('Task {bred}{tag}{rst} returned non-zero exit code: {ret}')
+        with open(os.path.abspath(os.path.join(outdir, host.address + srvname, 'scans', '000_errors.txt')), 'a') as file:
+            file.writelines(e('[*] Task {tag} returned non-zero exit code: {ret}. Command: {cmd}\n'))
     else:
         info('Task {bgreen}{tag}{rst} finished successfully.')
 
     return (tag, ret)
 
-def run_nmap_quick(address):
-    scandir = os.path.abspath(os.path.join(outdir, address + srvname, 'scans'))
+def run_nmap_quick(host):
+    scandir = os.path.abspath(os.path.join(outdir, host.address + srvname, 'scans'))
     run_cmd(
-        e('nmap -vv --reason -sS -sV {quick_ports} --version-light {nmap} -oN "{scandir}/000_quick_tcp_nmap.txt" -oX "{scandir}/000_quick_tcp_nmap.xml" {address}'),
-        e('nmap-quick ({address})')
+        e('nmap -vv --reason -sS -sV {quick_ports} --version-light {nmap} -oN "{scandir}/000_quick_tcp_nmap.txt" -oX "{scandir}/000_quick_tcp_nmap.xml" {host.address}'),
+        host,
+        e('nmap-quick ({host.address})')
     )
     return ('run_nmap_quick', e("{scandir}/000_quick_tcp_nmap.xml"))
 
-def run_nmap_tcp(address):
-    scandir = os.path.abspath(os.path.join(outdir, address + srvname, 'scans'))
+def run_nmap_tcp(host):
+    scandir = os.path.abspath(os.path.join(outdir, host.address + srvname, 'scans'))
     run_cmd(
-        e('nmap -vv --reason -sS -A -sV -sC {tcp_ports} --osscan-guess --version-all {nmap} -oN "{scandir}/000_full_tcp_nmap.txt" -oX "{scandir}/000_full_tcp_nmap.xml" {address}'),
-        e('nmap-tcp ({address})')
+        e('nmap -vv --reason -sS -A -sV -sC {tcp_ports} --osscan-guess --version-all {nmap} -oN "{scandir}/000_full_tcp_nmap.txt" -oX "{scandir}/000_full_tcp_nmap.xml" {host.address}'),
+        host,
+        e('nmap-tcp ({host.address})')
     )
     return ('run_nmap_tcp', e("{scandir}/000_full_tcp_nmap.xml"))
 
-def run_nmap_udp(address):
-    scandir = os.path.abspath(os.path.join(outdir, address + srvname, 'scans'))
+def run_nmap_udp(host):
+    scandir = os.path.abspath(os.path.join(outdir, host.address + srvname, 'scans'))
     run_cmd(
-        e('nmap -vv --reason -sU -A -sV -sC {udp_ports} --version-all --max-retries 1 {nmap} -oN "{scandir}/000_top_200_udp_nmap.txt" -oX "{scandir}/000_top_200_udp_nmap.xml" {address}'),
-        e('nmap-udp ({address})')
+        e('nmap -vv --reason -sU -A -sV -sC {udp_ports} --version-all --max-retries 1 {nmap} -oN "{scandir}/000_top_200_udp_nmap.txt" -oX "{scandir}/000_top_200_udp_nmap.xml" {host.address}'),
+        host,
+        e('nmap-udp ({host.address})')
     )
     return ('run_nmap_udp', e("{scandir}/000_top_200_udp_nmap.xml"))
 
@@ -201,8 +206,9 @@ def parse_nmap_services(report):
 
     return sorted(nmap_svcs, key=lambda s: s.port)
 
-def scan_service(scandir, address, port, service, tunnel):
+def scan_service(scandir, host, port, service, tunnel):
     global nmap
+    address = host.address
     secure = False
     if tunnel and ('ssl' in tunnel or 'tls' in tunnel):
         secure = True
@@ -220,7 +226,6 @@ def scan_service(scandir, address, port, service, tunnel):
 
     # Special cases for HTTP.
     scheme = 'https' if 'https' in service or 'ssl' in service or 'tls' in service or secure is True else 'http'
-    nikto_ssl = ' -ssl' if 'https' in service or 'ssl' in service or 'tls' in service or secure is True else ''
 
     cmds = []
     for serv in config["services"]:
@@ -245,18 +250,47 @@ def scan_service(scandir, address, port, service, tunnel):
             continue
 
         for command in config["services"][serv]['commands']:
-            cmds.extend([
-                (
-                    e(command['command']),
-                    e(command['tag'])
-                )
-            ])
+            if 'ports' in command:
+                port_match = False
+
+                if protocol == 'tcp':
+                    if 'tcp' in command['ports']:
+                        for tcp_port in command['ports']['tcp']:
+                            if port == tcp_port:
+                                port_match = True
+                                break
+                elif protocol == 'udp':
+                    if 'udp' in command['ports']:
+                        for udp_port in command['ports']['udp']:
+                            if port == udp_port:
+                                port_match = True
+                                break
+
+                if port_match == False:
+                    info(e(command['tag'] + " ({host.address}) cannot be run against port {port} due to limitations with the tool. Skipping."))
+                    continue
+
+            if e(command['tag']) in host.queued_tasks:
+                if 'run_once' in command and command['run_once'] == True:
+                    info(e(command['tag'] + ' ({host.address}) should only be run once and it appears to have already been queued. Skipping.'))
+                    continue
+                warn(e(command['tag'] + ' ({host.address}) appears to have already been queued, but it is not marked as run_once in config.json. Possible duplicate tag?'))
+            else:
+                host.queued_tasks.append(e(command['tag']))
+
+                cmds.extend([
+                    (
+                        e(command['command']),
+                        host,
+                        e(command['tag'] + " ({host.address})")
+                    )
+                ])
 
     return cmds
 
-def scan_host(address):
-    info('Scanning host {byellow}{address}{rst}.')
-    basedir = os.path.abspath(os.path.join(outdir, address + srvname))
+def scan_host(host):
+    info('Scanning host {byellow}{host.address}{rst}.')
+    basedir = os.path.abspath(os.path.join(outdir, host.address + srvname))
     os.makedirs(basedir, exist_ok=True)
 
     exploitdir = os.path.abspath(os.path.join(basedir, 'exploit'))
@@ -279,10 +313,10 @@ def scan_host(address):
         futures = []
 
         if not disable_quick:
-            futures.append(executor.submit(run_nmap_quick, address))
+            futures.append(executor.submit(run_nmap_quick, host))
 
-        futures.append(executor.submit(run_nmap_tcp, address))
-        futures.append(executor.submit(run_nmap_udp, address))
+        futures.append(executor.submit(run_nmap_tcp, host))
+        futures.append(executor.submit(run_nmap_udp, host))
 
         try:
             for future in as_completed(futures):
@@ -298,7 +332,7 @@ def scan_host(address):
                         if service.tunnel:
                             tunnel = service.tunnel
 
-                        service_tuple = (address, service.port * -1 if service.protocol == 'udp' else service.port, service.service, tunnel)
+                        service_tuple = (host, service.port * -1 if service.protocol == 'udp' else service.port, service.service, tunnel)
                         if service_tuple not in services:
                             services.append(service_tuple)
                         else:
@@ -326,9 +360,15 @@ def scan_host(address):
             executor._threads.clear()
             concurrent.futures.thread._threads_queues.clear()
 
-    info("Finished scanning host {byellow}{address}{rst}.")
+    info("Finished scanning host {byellow}{host.address}{rst}.")
 
     return 0
+
+class Host:
+
+    def __init__(self, address):
+        self.address = address
+        self.queued_tasks = []
 
 
 if __name__ == '__main__':
@@ -416,7 +456,8 @@ if __name__ == '__main__':
     with ProcessPoolExecutor(max_workers=concurrent_hosts) as executor:
         futures = []
 
-        for host in hosts:
+        for address in hosts:
+            host = Host(address)
             futures.append(executor.submit(scan_host, host))
 
         try:
