@@ -31,7 +31,7 @@ else:
 	if not os.path.exists(os.path.join(config['config_dir'], 'global.toml')):
 		shutil.copy(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'global.toml'), os.path.join(config['config_dir'], 'global.toml'))
 	if not os.path.exists(os.path.join(config['config_dir'], 'VERSION-' + VERSION)):
-		warn('It looks like the config in ' + config['config_dir'] + ' is outdated. Please remove the ' + config['config_dir'] + ' directory and re-run AutoRecon to rebuild it.')
+		warn('Oi bruv, it looks like the config in ' + config['config_dir'] + ' is a bit outdated, innit. Please remove the ' + config['config_dir'] + ' directory and re-run AutoRecon to rebuild it, yeah?')
 
 
 if not os.path.exists(config['data_dir']):
@@ -46,7 +46,7 @@ else:
 	if not os.path.exists(os.path.join(config['data_dir'], 'wordlists')):
 		shutil.copytree(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'wordlists'), os.path.join(config['data_dir'], 'wordlists'))
 	if not os.path.exists(os.path.join(config['data_dir'], 'VERSION-' + VERSION)):
-		warn('It looks like the plugins in ' + config['data_dir'] + ' are outdated. Please remove the ' + config['data_dir'] + ' directory and re-run AutoRecon to rebuild them.')
+		warn('Oi bruv, it looks like the plugins in ' + config['data_dir'] + ' are a bit outdated, innit. Please remove the ' + config['data_dir'] + ' directory and re-run AutoRecon to rebuild them, yeah?')
 
 
 # Saves current terminal settings so we can restore them.
@@ -566,7 +566,7 @@ async def scan_target(target):
 		autorecon.scanning_targets.append(target)
 
 	start_time = time.time()
-	info('Scanning target {byellow}' + target.address + '{rst}')
+	info('Right then bruv, scanning target {byellow}' + target.address + '{rst}, innit')
 
 	timed_out = False
 	while pending:
@@ -870,42 +870,42 @@ async def run():
 	else:
 		config['plugins_dir'] = None
 
-	parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False, description='Network reconnaissance tool to port scan and automatically enumerate services found on multiple targets.')
-	parser.add_argument('targets', action='store', help='IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan.', nargs='*')
-	parser.add_argument('-t', '--target-file', action='store', type=str, default='', help='Read targets from file.')
-	parser.add_argument('-p', '--ports', action='store', type=str, help='Comma separated list of ports / port ranges to scan. Specify TCP/UDP ports by prepending list with T:/U: To scan both TCP/UDP, put port(s) at start or specify B: e.g. 53,T:21-25,80,U:123,B:123. Default: %(default)s')
-	parser.add_argument('-m', '--max-scans', action='store', type=int, help='The maximum number of concurrent scans to run. Default: %(default)s')
-	parser.add_argument('-mp', '--max-port-scans', action='store', type=int, help='The maximum number of concurrent port scans to run. Default: 10 (approx 20%% of max-scans unless specified)')
-	parser.add_argument('-c', '--config', action='store', type=str, default=config_file, dest='config_file', help='Location of AutoRecon\'s config file. Default: %(default)s')
-	parser.add_argument('-g', '--global-file', action='store', type=str, help='Location of AutoRecon\'s global file. Default: %(default)s')
-	parser.add_argument('--tags', action='store', type=str, default='default', help='Tags to determine which plugins should be included. Separate tags by a plus symbol (+) to group tags together. Separate groups with a comma (,) to create multiple groups. For a plugin to be included, it must have all the tags specified in at least one group. Default: %(default)s')
-	parser.add_argument('--exclude-tags', action='store', type=str, default='', metavar='TAGS', help='Tags to determine which plugins should be excluded. Separate tags by a plus symbol (+) to group tags together. Separate groups with a comma (,) to create multiple groups. For a plugin to be excluded, it must have all the tags specified in at least one group. Default: %(default)s')
-	parser.add_argument('--port-scans', action='store', type=str, metavar='PLUGINS', help='Override --tags / --exclude-tags for the listed PortScan plugins (comma separated). Default: %(default)s')
-	parser.add_argument('--service-scans', action='store', type=str, metavar='PLUGINS', help='Override --tags / --exclude-tags for the listed ServiceScan plugins (comma separated). Default: %(default)s')
-	parser.add_argument('--reports', action='store', type=str, metavar='PLUGINS', help='Override --tags / --exclude-tags for the listed Report plugins (comma separated). Default: %(default)s')
-	parser.add_argument('--plugins-dir', action='store', type=str, help='The location of the plugins directory. Default: %(default)s')
-	parser.add_argument('--add-plugins-dir', action='store', type=str, metavar='PLUGINS_DIR', help='The location of an additional plugins directory to add to the main one. Default: %(default)s')
-	parser.add_argument('-l', '--list', action='store', nargs='?', const='plugins', metavar='TYPE', help='List all plugins or plugins of a specific type. e.g. --list, --list port, --list service')
-	parser.add_argument('-o', '--output', action='store', help='The output directory for results. Default: %(default)s')
-	parser.add_argument('--single-target', action='store_true', help='Only scan a single target. A directory named after the target will not be created. Instead, the directory structure will be created within the output directory. Default: %(default)s')
-	parser.add_argument('--only-scans-dir', action='store_true', help='Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created. Default: %(default)s')
-	parser.add_argument('--no-port-dirs', action='store_true', help='Don\'t create directories for ports (e.g. scans/tcp80, scans/udp53). Instead store all results in the "scans" directory itself. Default: %(default)s')
-	parser.add_argument('--heartbeat', action='store', type=int, help='Specifies the heartbeat interval (in seconds) for scan status messages. Default: %(default)s')
-	parser.add_argument('--timeout', action='store', type=int, help='Specifies the maximum amount of time in minutes that AutoRecon should run for. Default: %(default)s')
-	parser.add_argument('--target-timeout', action='store', type=int, help='Specifies the maximum amount of time in minutes that a target should be scanned for before abandoning it and moving on. Default: %(default)s')
+	parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False, description='Network reconnaissance tool to port scan and automatically enumerate services found on multiple targets, innit bruv.')
+	parser.add_argument('targets', action='store', help='IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan, innit.', nargs='*')
+	parser.add_argument('-t', '--target-file', action='store', type=str, default='', help='Read targets from file, bruv.')
+	parser.add_argument('-p', '--ports', action='store', type=str, help='Comma separated list of ports / port ranges to scan, innit. Specify TCP/UDP ports by prepending list with T:/U: To scan both TCP/UDP, put port(s) at start or specify B: e.g. 53,T:21-25,80,U:123,B:123. Default: %(default)s, bruv')
+	parser.add_argument('-m', '--max-scans', action='store', type=int, help='The maximum number of concurrent scans to run, innit. Default: %(default)s, bruv')
+	parser.add_argument('-mp', '--max-port-scans', action='store', type=int, help='The maximum number of concurrent port scans to run, innit. Default: 10 (approx 20%% of max-scans unless specified), bruv')
+	parser.add_argument('-c', '--config', action='store', type=str, default=config_file, dest='config_file', help='Location of AutoRecon\'s config file, innit. Default: %(default)s, bruv')
+	parser.add_argument('-g', '--global-file', action='store', type=str, help='Location of AutoRecon\'s global file, innit. Default: %(default)s, bruv')
+	parser.add_argument('--tags', action='store', type=str, default='default', help='Tags to determine which plugins should be included, innit. Separate tags by a plus symbol (+) to group tags together. Separate groups with a comma (,) to create multiple groups. For a plugin to be included, it must have all the tags specified in at least one group, bruv. Default: %(default)s')
+	parser.add_argument('--exclude-tags', action='store', type=str, default='', metavar='TAGS', help='Tags to determine which plugins should be excluded, innit. Separate tags by a plus symbol (+) to group tags together. Separate groups with a comma (,) to create multiple groups. For a plugin to be excluded, it must have all the tags specified in at least one group, bruv. Default: %(default)s')
+	parser.add_argument('--port-scans', action='store', type=str, metavar='PLUGINS', help='Override --tags / --exclude-tags for the listed PortScan plugins (comma separated), innit. Default: %(default)s, bruv')
+	parser.add_argument('--service-scans', action='store', type=str, metavar='PLUGINS', help='Override --tags / --exclude-tags for the listed ServiceScan plugins (comma separated), innit. Default: %(default)s, bruv')
+	parser.add_argument('--reports', action='store', type=str, metavar='PLUGINS', help='Override --tags / --exclude-tags for the listed Report plugins (comma separated), innit. Default: %(default)s, bruv')
+	parser.add_argument('--plugins-dir', action='store', type=str, help='The location of the plugins directory, innit. Default: %(default)s, bruv')
+	parser.add_argument('--add-plugins-dir', action='store', type=str, metavar='PLUGINS_DIR', help='The location of an additional plugins directory to add to the main one, innit. Default: %(default)s, bruv')
+	parser.add_argument('-l', '--list', action='store', nargs='?', const='plugins', metavar='TYPE', help='List all plugins or plugins of a specific type, innit. e.g. --list, --list port, --list service, bruv')
+	parser.add_argument('-o', '--output', action='store', help='The output directory for results, innit. Default: %(default)s, bruv')
+	parser.add_argument('--single-target', action='store_true', help='Only scan a single target, innit. A directory named after the target won\'t be created. Instead, the directory structure will be created within the output directory, bruv. Default: %(default)s')
+	parser.add_argument('--only-scans-dir', action='store_true', help='Only create the "scans" directory for results, innit. Other directories (e.g. exploit, loot, report) won\'t be created, bruv. Default: %(default)s')
+	parser.add_argument('--no-port-dirs', action='store_true', help='Don\'t create directories for ports (e.g. scans/tcp80, scans/udp53), innit. Instead store all results in the "scans" directory itself, bruv. Default: %(default)s')
+	parser.add_argument('--heartbeat', action='store', type=int, help='Specifies the heartbeat interval (in seconds) for scan status messages, innit. Default: %(default)s, bruv')
+	parser.add_argument('--timeout', action='store', type=int, help='Specifies the maximum amount of time in minutes that AutoRecon should run for, innit. Default: %(default)s, bruv')
+	parser.add_argument('--target-timeout', action='store', type=int, help='Specifies the maximum amount of time in minutes that a target should be scanned for before abandoning it and moving on, innit. Default: %(default)s, bruv')
 	nmap_group = parser.add_mutually_exclusive_group()
-	nmap_group.add_argument('--nmap', action='store', help='Override the {nmap_extra} variable in scans. Default: %(default)s')
-	nmap_group.add_argument('--nmap-append', action='store', help='Append to the default {nmap_extra} variable in scans. Default: %(default)s')
-	parser.add_argument('--proxychains', action='store_true', help='Use if you are running AutoRecon via proxychains. Default: %(default)s')
-	parser.add_argument('--disable-sanity-checks', action='store_true', help='Disable sanity checks that would otherwise prevent the scans from running. Default: %(default)s')
-	parser.add_argument('--disable-keyboard-control', action='store_true', help='Disables keyboard control ([s]tatus, Up, Down) if you are in SSH or Docker.')
-	parser.add_argument('--ignore-plugin-checks', action='store_true', help='Ignores errors from plugin check functions that would otherwise prevent AutoRecon from running. Default: %(default)s')
-	parser.add_argument('--force-services', action='store', nargs='+', metavar='SERVICE', help='A space separated list of services in the following style: tcp/80/http tcp/443/https/secure')
-	parser.add_argument('-mpti', '--max-plugin-target-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of instances (per target) in the following style: nmap-http:2 dirbuster:1. Default: %(default)s')
-	parser.add_argument('-mpgi', '--max-plugin-global-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of global instances in the following style: nmap-http:2 dirbuster:1. Default: %(default)s')
-	parser.add_argument('--accessible', action='store_true', help='Attempts to make AutoRecon output more accessible to screenreaders. Default: %(default)s')
-	parser.add_argument('-v', '--verbose', action='count', help='Enable verbose output. Repeat for more verbosity.')
-	parser.add_argument('--version', action='store_true', help='Prints the AutoRecon version and exits.')
+	nmap_group.add_argument('--nmap', action='store', help='Override the {nmap_extra} variable in scans, innit. Default: %(default)s, bruv')
+	nmap_group.add_argument('--nmap-append', action='store', help='Append to the default {nmap_extra} variable in scans, innit. Default: %(default)s')
+	parser.add_argument('--proxychains', action='store_true', help='Use if you\'re running AutoRecon via proxychains, innit. Default: %(default)s, bruv')
+	parser.add_argument('--disable-sanity-checks', action='store_true', help='Disable sanity checks that would otherwise prevent the scans from running, innit. Default: %(default)s, bruv')
+	parser.add_argument('--disable-keyboard-control', action='store_true', help='Disables keyboard control ([s]tatus, Up, Down) if you\'re in SSH or Docker, innit.')
+	parser.add_argument('--ignore-plugin-checks', action='store_true', help='Ignores errors from plugin check functions that would otherwise prevent AutoRecon from running, innit. Default: %(default)s, bruv')
+	parser.add_argument('--force-services', action='store', nargs='+', metavar='SERVICE', help='A space separated list of services in the following style: tcp/80/http tcp/443/https/secure, innit')
+	parser.add_argument('-mpti', '--max-plugin-target-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of instances (per target) in the following style: nmap-http:2 dirbuster:1, innit. Default: %(default)s, bruv')
+	parser.add_argument('-mpgi', '--max-plugin-global-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of global instances in the following style: nmap-http:2 dirbuster:1, innit. Default: %(default)s, bruv')
+	parser.add_argument('--accessible', action='store_true', help='Attempts to make AutoRecon output more accessible to screenreaders, innit. Default: %(default)s, bruv')
+	parser.add_argument('-v', '--verbose', action='count', help='Enable verbose output, innit. Repeat for more verbosity, bruv.')
+	parser.add_argument('--version', action='store_true', help='Prints the AutoRecon version and exits, innit.')
 	parser.error = lambda s: fail(s[0].upper() + s[1:])
 	args, unknown = parser.parse_known_args()
 
@@ -1482,11 +1482,11 @@ async def run():
 		errors = True
 
 	if len(autorecon.pending_targets) == 0:
-		error('You must specify at least one target to scan!')
+		error('Oi bruv, you\'ve got to specify at least one target to scan, innit!')
 		errors = True
 
 	if config['single_target'] and len(autorecon.pending_targets) != 1:
-		error('You cannot provide more than one target when scanning in single-target mode.')
+		error('I\'m terribly sorry love, but you simply cannot provide more than one target when scanning in single-target mode.')
 		errors = True
 
 	if not args.disable_sanity_checks and len(autorecon.pending_targets) > 256:
@@ -1516,7 +1516,7 @@ async def run():
 				port_scan_plugin_count += 1
 
 		if port_scan_plugin_count == 0:
-			error('There are no port scan plugins that match the tags specified.')
+			error('Oi bruv, there are no port scan plugins that match the tags specified. Proper rubbish that is, innit.')
 			errors = True
 	else:
 		port_scan_plugin_count = config['max_port_scans'] / 5
@@ -1622,17 +1622,17 @@ async def run():
 		cancel_all_tasks(None, None)
 
 		elapsed_time = calculate_elapsed_time(start_time)
-		warn('{byellow}AutoRecon took longer than the specified timeout period (' + str(config['timeout']) + ' min). Cancelling all scans and exiting.{rst}')
+		warn('{byellow}Bloody hell bruv! AutoRecon took way longer than the specified timeout period (' + str(config['timeout']) + ' min). Cancelling all scans and exiting, proper gutted innit.{rst}')
 	else:
 		while len(asyncio.all_tasks()) > 1: # this code runs in the main() task so it will be the only task left running
 			await asyncio.sleep(1)
 
 		elapsed_time = calculate_elapsed_time(start_time)
-		info('{bright}Finished scanning all targets in ' + elapsed_time + '!{rst}')
-		info('{bright}Don\'t forget to check out more commands to run manually in the _manual_commands.txt file in each target\'s scans directory!')
+		info('{bright}Sorted! Finished scanning all targets in ' + elapsed_time + ', bruv!{rst}')
+		info('{bright}Bruv. Don\'t forget to have a proper look at the additional commands to run manually in the _manual_commands.txt file in each target\'s scans directory.')
 
 	if autorecon.missing_services:
-		warn('{byellow}AutoRecon identified the following services, but could not match them to any plugins based on the service name. Please report these to Tib3rius: ' + ', '.join(autorecon.missing_services) + '{rst}')
+		warn('{byellow}Blimey bruv! AutoRecon identified the following services, but couldn\'t quite match them to any plugins based on the service name. Proper annoying that is, innit. Please report these to Tib3rius: ' + ', '.join(autorecon.missing_services) + '{rst}')
 
 	if not config['disable_keyboard_control']:
 		# Restore original terminal settings.

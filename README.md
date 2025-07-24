@@ -2,25 +2,27 @@
 
 # AutoRecon
 
-AutoRecon is a multi-threaded network reconnaissance tool which performs automated enumeration of services. It is intended as a time-saving tool for use in CTFs and other penetration testing environments (e.g. OSCP). It may also be useful in real-world engagements.
+AutoRecon is a proper multi-threaded network reconnaissance tool which performs automated enumeration of services, innit. It's intended as a time-saving tool for use in CTFs and other penetration testing environments (e.g. OSCP), bruv. It may also be useful in real-world engagements, yeah?
 
-The tool works by firstly performing port scans / service detection scans. From those initial results, the tool will launch further enumeration scans of those services using a number of different tools. For example, if HTTP is found, feroxbuster will be launched (as well as many others).
+The tool works by firstly performing port scans / service detection scans, innit. From those initial results, the tool will launch further enumeration scans of those services using a number of different tools, bruv. For example, if HTTP is found, feroxbuster will be launched (as well as many others), yeah?
 
-Everything in the tool is highly configurable. The default configuration performs **no automated exploitation** to keep the tool in line with OSCP exam rules. If you wish to add automatic exploit tools to the configuration, you do so at your own risk. The author will not be held responsible for negative actions that result from the mis-use of this tool.
+Everything in the tool is highly configurable, innit. The default configuration performs **no automated exploitation** to keep the tool in line with OSCP exam rules, bruv. If you wish to add automatic exploit tools to the configuration, you do so at your own risk, yeah? The author won't be held responsible for negative actions that result from the mis-use of this tool, innit.
 
-**Disclaimer: While AutoRecon endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated. Users of AutoRecon (especially students) should perform their own manual enumeration alongside AutoRecon. Do not rely on this tool alone for exams, CTFs, or other engagements.**
+**Disclaimer: While AutoRecon endeavours to perform as much identification and enumeration of services as possible, there's no guarantee that every service will be identified, or that every service will be fully enumerated, innit. Users of AutoRecon (especially students) should perform their own manual enumeration alongside AutoRecon. Don't rely on this tool alone for exams, CTFs, or other engagements, innit.**
+
+**Licensure: All countrymen of the king must be havin' a recon-scanning loicense to run this tool, innit.**
 
 ## Origin
 
-AutoRecon was inspired by three tools which the author used during the OSCP labs: [Reconnoitre](https://github.com/codingo/Reconnoitre), [ReconScan](https://github.com/RoliSoft/ReconScan), and [bscan](https://github.com/welchbj/bscan). While all three tools were useful, none of the three alone had the functionality desired. AutoRecon combines the best features of the aforementioned tools while also implementing many new features to help testers with enumeration of multiple targets.
+AutoRecon was inspired by three tools which the author used during the OSCP labs: [Reconnoitre](https://github.com/codingo/Reconnoitre), [ReconScan](https://github.com/RoliSoft/ReconScan), and [bscan](https://github.com/welchbj/bscan). While all three tools were proper useful, none of the three alone had the functionality desired, innit. AutoRecon combines the best features of the aforementioned tools while also implementing many new features to help testers with enumeration of multiple targets, bruv.
 
 ## Features
 
 * Supports multiple targets in the form of IP addresses, IP ranges (CIDR notation), and resolvable hostnames. IPv6 is also supported.
-* Can scan multiple targets concurrently, utilizing multiple processors if they are available.
+* Can scan multiple targets concurrently, utilising multiple processors if they are available.
 * Advanced plugin system allowing for easy creation of new scans.
-* Customizable port scanning plugins for flexibility in your initial scans.
-* Customizable service scanning plugins for further enumeration.
+* Customisable port scanning plugins for flexibility in your initial scans.
+* Customisable service scanning plugins for further enumeration.
 * Suggested manual follow-up commands for when automation makes little sense.
 * Ability to limit port scanning to a combination of TCP/UDP ports.
 * Ability to skip port scanning phase by supplying information about services which should be open.
@@ -31,11 +33,11 @@ AutoRecon was inspired by three tools which the author used during the OSCP labs
 * A tagging system that lets you include or exclude certain plugins.
 * Global and per-target timeouts in case you only have limited time.
 * Four levels of verbosity, controllable by command-line options, and during scans using Up/Down arrows.
-* Colorized output for distinguishing separate pieces of information. Can be turned off for accessibility reasons.
+* Colourised output for distinguishing separate pieces of information. Can be turned off for accessibility reasons.
 
 ## Installation
 
-There are three ways to install AutoRecon: pipx, pip, and manually. Before installation using any of these methods, certain requirements need to be fulfilled. If you have not refreshed your apt cache recently, run the following command so you are installing the latest available packages:
+Right love, there are three ways to install AutoRecon: pipx, pip, and manually. Before installation using any of these methods, certain requirements need to be fulfilled. If you have not refreshed your apt cache recently, run the following command so you are installing the latest available packages:
 
 ```bash
 sudo apt update
@@ -43,7 +45,7 @@ sudo apt update
 
 ### Python 3
 
-AutoRecon requires the usage of Python 3.8+ and pip, which can be installed on Kali Linux using the following commands:
+AutoRecon requires the usage of Python 3.8+ and pip, which can be installed on Kali Linux using the following commands, innit:
 
 ```bash
 sudo apt install python3
@@ -52,15 +54,15 @@ sudo apt install python3-pip
 
 ### Supporting Packages
 
-Several commands used in AutoRecon reference the SecLists project, in the directory /usr/share/seclists/. You can either manually download the SecLists project to this directory (https://github.com/danielmiessler/SecLists), or if you are using Kali Linux (**highly recommended**) you can run the following commands:
+Several commands used in AutoRecon reference the SecLists project, in the directory /usr/share/seclists/, innit. You can either manually download the SecLists project to this directory (https://github.com/danielmiessler/SecLists), or if you're using Kali Linux (**highly recommended**) you can run the following commands, bruv:
 
 ```bash
 sudo apt install seclists
 ```
 
-AutoRecon will still run if you do not install SecLists, though several commands may fail, and some manual commands may not run either.
+AutoRecon will still run if you don't install SecLists, though several commands may fail, and some manual commands may not run either, innit.
 
-Additionally the following commands may need to be installed, depending on your OS:
+Additionally the following commands may need to be installed, depending on your OS, bruv:
 
 ```
 curl
@@ -84,7 +86,7 @@ tnscmd10g
 whatweb
 ```
 
-On Kali Linux, you can ensure these are all installed using the following commands:
+On Kali Linux, you can ensure these are all installed using the following commands, innit:
 
 ```bash
 sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nikto nmap onesixtyone oscanner redis-tools smbclient smbmap snmp sslscan sipvicious tnscmd10g whatweb
@@ -92,7 +94,7 @@ sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket
 
 ### Installation Method #1: pipx (Recommended)
 
-It is recommended you use `pipx` to install AutoRecon. pipx will install AutoRecon in it's own virtual environment, and make it available in the global context, avoiding conflicting package dependencies and the resulting instability. First, install pipx using the following commands:
+It's recommended you use `pipx` to install AutoRecon, innit. pipx will install AutoRecon in its own virtual environment, and make it available in the global context, avoiding conflicting package dependencies and the resulting instability, bruv. First, install pipx using the following commands:
 
 
 ```bash
@@ -101,7 +103,7 @@ python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 ```
 
-You will have to re-source your ~/.bashrc or ~/.zshrc file (or open a new tab) after running these commands in order to use pipx.
+You'll have to re-source your ~/.bashrc or ~/.zshrc file (or open a new tab) after running these commands in order to use pipx, innit.
 
 Install AutoRecon using the following command:
 
@@ -109,7 +111,7 @@ Install AutoRecon using the following command:
 pipx install git+https://github.com/Tib3rius/AutoRecon.git
 ```
 
-Note that if you want to run AutoRecon using sudo (required for faster SYN scanning and UDP scanning), you have to use _one_ of the following examples:
+Note that if you want to run AutoRecon using sudo (required for faster SYN scanning and UDP scanning), you've got to use _one_ of the following examples, bruv:
 
 ```bash
 sudo env "PATH=$PATH" autorecon [OPTIONS]
@@ -118,19 +120,19 @@ sudo $(which autorecon) [OPTIONS]
 
 ### Installation Method #2: pip
 
-Alternatively you can use `pip` to install AutoRecon using the following command:
+Alternatively you can use `pip` to install AutoRecon using the following command, innit:
 
 ```bash
 python3 -m pip install git+https://github.com/Tib3rius/AutoRecon.git
 ```
 
-Note that if you want to run AutoRecon using sudo (required for faster SYN scanning and UDP scanning), you will have to run the above command as the root user (or using sudo).
+Note that if you want to run AutoRecon using sudo (required for faster SYN scanning and UDP scanning), you'll have to run the above command as the root user (or using sudo), bruv.
 
-Similarly to `pipx`, if installed using `pip` you can run AutoRecon by simply executing `autorecon`.
+Similarly to `pipx`, if installed using `pip` you can run AutoRecon by simply executing `autorecon`, innit.
 
 ### Installation Method #3: Manually
 
-If you'd prefer not to use `pip` or `pipx`, you can always still install and execute `autorecon.py` manually as a script. From within the AutoRecon directory, install the dependencies:
+If you'd prefer not to use `pip` or `pipx`, you can always still install and execute `autorecon.py` manually as a script, innit. From within the AutoRecon directory, install the dependencies:
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -191,96 +193,96 @@ usage: autorecon [-t TARGET_FILE] [-p PORTS] [-m MAX_SCANS] [-mp MAX_PORT_SCANS]
                  [--global.domain VALUE] [-h]
                  [targets ...]
 
-Network reconnaissance tool to port scan and automatically enumerate services found on multiple targets.
+Network reconnaissance tool to port scan and automatically enumerate services found on multiple targets, innit bruv.
 
 positional arguments:
-  targets               IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan.
+  targets               IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan, innit.
 
 optional arguments:
   -t TARGET_FILE, --target-file TARGET_FILE
-                        Read targets from file.
+                        Read targets from file, bruv.
   -p PORTS, --ports PORTS
-                        Comma separated list of ports / port ranges to scan. Specify TCP/UDP ports by prepending list with T:/U: To scan both
-                        TCP/UDP, put port(s) at start or specify B: e.g. 53,T:21-25,80,U:123,B:123. Default: None
+                        Comma separated list of ports / port ranges to scan, innit. Specify TCP/UDP ports by prepending list with T:/U: To scan both
+                        TCP/UDP, put port(s) at start or specify B: e.g. 53,T:21-25,80,U:123,B:123. Default: None, bruv
   -m MAX_SCANS, --max-scans MAX_SCANS
-                        The maximum number of concurrent scans to run. Default: 50
+                        The maximum number of concurrent scans to run, innit. Default: 50, bruv
   -mp MAX_PORT_SCANS, --max-port-scans MAX_PORT_SCANS
-                        The maximum number of concurrent port scans to run. Default: 10 (approx 20% of max-scans unless specified)
+                        The maximum number of concurrent port scans to run, innit. Default: 10 (approx 20% of max-scans unless specified), bruv
   -c CONFIG_FILE, --config CONFIG_FILE
-                        Location of AutoRecon's config file. Default: ~/.config/AutoRecon/config.toml
+                        Location of AutoRecon's config file, innit. Default: ~/.config/AutoRecon/config.toml, bruv
   -g GLOBAL_FILE, --global-file GLOBAL_FILE
-                        Location of AutoRecon's global file. Default: ~/.config/AutoRecon/global.toml
-  --tags TAGS           Tags to determine which plugins should be included. Separate tags by a plus symbol (+) to group tags together. Separate
+                        Location of AutoRecon's global file, innit. Default: ~/.config/AutoRecon/global.toml, bruv
+  --tags TAGS           Tags to determine which plugins should be included, innit. Separate tags by a plus symbol (+) to group tags together. Separate
                         groups with a comma (,) to create multiple groups. For a plugin to be included, it must have all the tags specified in
-                        at least one group. Default: default
-  --exclude-tags TAGS   Tags to determine which plugins should be excluded. Separate tags by a plus symbol (+) to group tags together. Separate
+                        at least one group, bruv. Default: default
+  --exclude-tags TAGS   Tags to determine which plugins should be excluded, innit. Separate tags by a plus symbol (+) to group tags together. Separate
                         groups with a comma (,) to create multiple groups. For a plugin to be excluded, it must have all the tags specified in
-                        at least one group. Default: None
-  --port-scans PLUGINS  Override --tags / --exclude-tags for the listed PortScan plugins (comma separated). Default: None
+                        at least one group, bruv. Default: None
+  --port-scans PLUGINS  Override --tags / --exclude-tags for the listed PortScan plugins (comma separated), innit. Default: None, bruv
   --service-scans PLUGINS
-                        Override --tags / --exclude-tags for the listed ServiceScan plugins (comma separated). Default: None
-  --reports PLUGINS     Override --tags / --exclude-tags for the listed Report plugins (comma separated). Default: None
+                        Override --tags / --exclude-tags for the listed ServiceScan plugins (comma separated), innit. Default: None, bruv
+  --reports PLUGINS     Override --tags / --exclude-tags for the listed Report plugins (comma separated), innit. Default: None, bruv
   --plugins-dir PLUGINS_DIR
-                        The location of the plugins directory. Default: ~/.local/share/AutoRecon/plugins
+                        The location of the plugins directory, innit. Default: ~/.local/share/AutoRecon/plugins, bruv
   --add-plugins-dir PLUGINS_DIR
-                        The location of an additional plugins directory to add to the main one. Default: None
+                        The location of an additional plugins directory to add to the main one, innit. Default: None, bruv
   -l [TYPE], --list [TYPE]
-                        List all plugins or plugins of a specific type. e.g. --list, --list port, --list service
+                        List all plugins or plugins of a specific type, innit. e.g. --list, --list port, --list service, bruv
   -o OUTPUT, --output OUTPUT
-                        The output directory for results. Default: results
-  --single-target       Only scan a single target. A directory named after the target will not be created. Instead, the directory structure will
-                        be created within the output directory. Default: False
-  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created.
+                        The output directory for results, innit. Default: results, bruv
+  --single-target       Only scan a single target, innit. A directory named after the target won't be created. Instead, the directory structure will
+                        be created within the output directory, bruv. Default: False
+  --only-scans-dir      Only create the "scans" directory for results, innit. Other directories (e.g. exploit, loot, report) won't be created, bruv.
                         Default: False
-  --no-port-dirs        Don't create directories for ports (e.g. scans/tcp80, scans/udp53). Instead store all results in the "scans" directory
-                        itself. Default: False
+  --no-port-dirs        Don't create directories for ports (e.g. scans/tcp80, scans/udp53), innit. Instead store all results in the "scans" directory
+                        itself, bruv. Default: False
   --heartbeat HEARTBEAT
-                        Specifies the heartbeat interval (in seconds) for scan status messages. Default: 60
-  --timeout TIMEOUT     Specifies the maximum amount of time in minutes that AutoRecon should run for. Default: None
+                        Specifies the heartbeat interval (in seconds) for scan status messages, innit. Default: 60, bruv
+  --timeout TIMEOUT     Specifies the maximum amount of time in minutes that AutoRecon should run for, innit. Default: None, bruv
   --target-timeout TARGET_TIMEOUT
-                        Specifies the maximum amount of time in minutes that a target should be scanned for before abandoning it and moving on.
-                        Default: None
-  --nmap NMAP           Override the {nmap_extra} variable in scans. Default: -vv --reason -Pn -T4
+                        Specifies the maximum amount of time in minutes that a target should be scanned for before abandoning it and moving on, innit.
+                        Default: None, bruv
+  --nmap NMAP           Override the {nmap_extra} variable in scans, innit. Default: -vv --reason -Pn -T4, bruv
   --nmap-append NMAP_APPEND
-                        Append to the default {nmap_extra} variable in scans. Default:
-  --proxychains         Use if you are running AutoRecon via proxychains. Default: False
+                        Append to the default {nmap_extra} variable in scans, innit. Default:
+  --proxychains         Use if you're running AutoRecon via proxychains, innit. Default: False, bruv
   --disable-sanity-checks
-                        Disable sanity checks that would otherwise prevent the scans from running. Default: False
+                        Disable sanity checks that would otherwise prevent the scans from running, innit. Default: False, bruv
   --disable-keyboard-control
-                        Disables keyboard control ([s]tatus, Up, Down) if you are in SSH or Docker.
+                        Disables keyboard control ([s]tatus, Up, Down) if you're in SSH or Docker, innit.
   --force-services SERVICE [SERVICE ...]
-                        A space separated list of services in the following style: tcp/80/http tcp/443/https/secure
-  --accessible          Attempts to make AutoRecon output more accessible to screenreaders. Default: False
-  -v, --verbose         Enable verbose output. Repeat for more verbosity.
-  --version             Prints the AutoRecon version and exits.
-  -h, --help            Show this help message and exit.
+                        A space separated list of services in the following style: tcp/80/http tcp/443/https/secure, innit
+  --accessible          Attempts to make AutoRecon output more accessible to screenreaders, innit. Default: False, bruv
+  -v, --verbose         Enable verbose output, innit. Repeat for more verbosity, bruv.
+  --version             Prints the AutoRecon version and exits, innit.
+  -h, --help            Show this help message and exit, bruv.
 
 plugin arguments:
-  These are optional arguments for certain plugins.
+  These are optional arguments for certain plugins, innit.
 
-  --curl.path VALUE     The path on the web server to curl. Default: /
+  --curl.path VALUE     The path on the web server to curl, innit. Default: /, bruv
   --dirbuster.tool {feroxbuster,gobuster,dirsearch,ffuf,dirb}
-                        The tool to use for directory busting. Default: feroxbuster
+                        The tool to use for directory busting, innit. Default: feroxbuster, bruv
   --dirbuster.wordlist VALUE [VALUE ...]
-                        The wordlist(s) to use when directory busting. Separate multiple wordlists with spaces. Default:
-                        ['~/.local/share/AutoRecon/wordlists/dirbuster.txt']
+                        The wordlist(s) to use when directory busting, innit. Separate multiple wordlists with spaces. Default:
+                        ['~/.local/share/AutoRecon/wordlists/dirbuster.txt'], bruv
   --dirbuster.threads VALUE
-                        The number of threads to use when directory busting. Default: 10
+                        The number of threads to use when directory busting, innit. Default: 10, bruv
   --dirbuster.ext VALUE
-                        The extensions you wish to fuzz (no dot, comma separated). Default: txt,html,php,asp,aspx,jsp
+                        The extensions you wish to fuzz (no dot, comma separated), innit. Default: txt,html,php,asp,aspx,jsp, bruv
   --onesixtyone.community-strings VALUE
-                        The file containing a list of community strings to try. Default: /usr/share/seclists/Discovery/SNMP/common-snmp-
-                        community-strings-onesixtyone.txt
+                        The file containing a list of community strings to try, innit. Default: /usr/share/seclists/Discovery/SNMP/common-snmp-
+                        community-strings-onesixtyone.txt, bruv
 
 global plugin arguments:
-  These are optional arguments that can be used by all plugins.
+  These are optional arguments that can be used by all plugins, innit.
 
   --global.username-wordlist VALUE
-                        A wordlist of usernames, useful for bruteforcing. Default: /usr/share/seclists/Usernames/top-usernames-shortlist.txt
+                        A wordlist of usernames, useful for bruteforcing, innit. Default: /usr/share/seclists/Usernames/top-usernames-shortlist.txt, bruv
   --global.password-wordlist VALUE
-                        A wordlist of passwords, useful for bruteforcing. Default: /usr/share/seclists/Passwords/darkweb2017-top100.txt
+                        A wordlist of passwords, useful for bruteforcing, innit. Default: /usr/share/seclists/Passwords/darkweb2017-top100.txt, bruv
   --global.domain VALUE
-                        The domain to use (if known). Used for DNS and/or Active Directory. Default: None
+                        The domain to use (if known), innit. Used for DNS and/or Active Directory. Default: None, bruv
 ```
 
 ### Verbosity
@@ -329,7 +331,7 @@ The scans directory is where all results from scans performed by AutoRecon will 
 * \_commands.log contains a list of every command AutoRecon ran against the target. This is useful if one of the commands fails and you want to run it again with modifications.
 * \_manual_commands.txt contains any commands that are deemed "too dangerous" to run automatically, either because they are too intrusive, require modification based on human analysis, or just work better when there is a human monitoring them.
 
-By default, directories are created for each open port (e.g. tcp80, udp53) and scan results for the services found on those ports are stored in their respective directories. You can disable this behavior using the --no-port-dirs command line option, and scan results will instead be stored in the scans directory itself.
+By default, directories are created for each open port (e.g. tcp80, udp53) and scan results for the services found on those ports are stored in their respective directories. You can disable this behaviour using the --no-port-dirs command line option, and scan results will instead be stored in the scans directory itself.
 
 If a scan results in an error, a file called \_errors.log will also appear in the scans directory with some details to alert the user.
 

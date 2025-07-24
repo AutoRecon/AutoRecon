@@ -45,7 +45,7 @@ class Plugin(object):
 	@final
 	def add_choice_option(self, name, choices, default=None, help=None):
 		if not isinstance(choices, list):
-			fail('The choices argument for ' + self.name + '\'s ' + name + ' choice option should be a list.')
+			fail('Oi bruv, the choices argument for ' + self.name + '\'s ' + name + ' choice option should be a list, innit.')
 		self.autorecon.add_argument(self, name, choices=choices, default=default, help=help)
 
 	@final
@@ -96,7 +96,7 @@ class Plugin(object):
 			else:
 				self.patterns.append(Pattern(compiled))
 		except re.error:
-			fail('Error: The pattern "' + pattern + '" in the plugin "' + self.name + '" is invalid regex.')
+			fail('Oi bruv, the pattern "' + pattern + '" in the plugin "' + self.name + '" is invalid regex, innit.')
 
 	@final
 	def info(self, msg, verbosity=0):
@@ -290,7 +290,7 @@ class AutoRecon(object):
 			return
 
 		if plugin.name is None:
-			fail('Error: Plugin with class name "' + plugin.__class__.__name__ + '" in ' + filename + ' does not have a name.')
+			fail('Oi bruv, plugin with class name "' + plugin.__class__.__name__ + '" in ' + filename + ' doesn\'t have a name, innit.')
 
 		for _, loaded_plugin in self.plugins.items():
 			if plugin.name == loaded_plugin.name:
@@ -331,11 +331,11 @@ class AutoRecon(object):
 
 			if issubclass(plugin.__class__, PortScan):
 				if plugin.type is None:
-					fail('Error: the PortScan plugin "' + plugin.name + '" in ' + filename + ' requires a type (either tcp or udp).')
+					fail('Oi bruv, the PortScan plugin "' + plugin.name + '" in ' + filename + ' needs a type (either tcp or udp), innit.')
 				else:
 					plugin.type = plugin.type.lower()
 					if plugin.type not in ['tcp', 'udp']:
-						fail('Error: the PortScan plugin "' + plugin.name + '" in ' + filename + ' has an invalid type (should be tcp or udp).')
+						fail('Oi bruv, the PortScan plugin "' + plugin.name + '" in ' + filename + ' has an invalid type (should be tcp or udp), innit.')
 				self.plugin_types["port"].append(plugin)
 			elif issubclass(plugin.__class__, ServiceScan):
 				self.plugin_types["service"].append(plugin)
