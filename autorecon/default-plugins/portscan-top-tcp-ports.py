@@ -21,7 +21,7 @@ class QuickTCPPortScan(PortScan):
 		else:
 			traceroute_os = ' -A --osscan-guess'
 
-		process, stdout, stderr = await target.execute('nmap {nmap_extra} -sV -sC --version-all' + traceroute_os + ' -oN "{scandir}/_quick_tcp_nmap.txt" -oX "{scandir}/xml/_quick_tcp_nmap.xml" {address}', blocking=False)
+		process, stdout, stderr = await target.execute('nmap {nmap_extra} -sV -sC --version-all' + traceroute_os + ' -oN "{scandir}/' + str(target.address) + '_quick_tcp_nmap.txt" -oX "{scandir}/xml/' + str(target.address) + '_quick_tcp_nmap.xml" {address}', blocking=False)
 		services = await target.extract_services(stdout)
 
 		for service in services:

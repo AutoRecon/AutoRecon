@@ -17,11 +17,11 @@ class Top100UDPPortScan(PortScan):
 		if os.getuid() == 0 or config['disable_sanity_checks']:
 			if target.ports:
 				if target.ports['udp']:
-					process, stdout, stderr = await target.execute('nmap {nmap_extra} -sU -A --osscan-guess -p ' + target.ports['udp'] + ' -oN "{scandir}/_custom_ports_udp_nmap.txt" -oX "{scandir}/xml/_custom_ports_udp_nmap.xml" {address}', blocking=False)
+					process, stdout, stderr = await target.execute('nmap {nmap_extra} -sU -A --osscan-guess -p ' + target.ports['udp'] + ' -oN "{scandir}/' + str(target.address) + '_custom_ports_udp_nmap.txt" -oX "{scandir}/xml/' + str(target.address) + '_custom_ports_udp_nmap.xml" {address}', blocking=False)
 				else:
 					return []
 			else:
-				process, stdout, stderr = await target.execute('nmap {nmap_extra} -sU -A --top-ports 100 -oN "{scandir}/_top_100_udp_nmap.txt" -oX "{scandir}/xml/_top_100_udp_nmap.xml" {address}', blocking=False)
+				process, stdout, stderr = await target.execute('nmap {nmap_extra} -sU -A --top-ports 100 -oN "{scandir}/' + str(target.address) + '_top_100_udp_nmap.txt" -oX "{scandir}/xml/' + str(target.address) + '_top_100_udp_nmap.xml" {address}', blocking=False)
 			services = []
 			while True:
 				line = await stdout.readline()
