@@ -11,9 +11,11 @@ class DirBuster(ServiceScan):
 		self.slug = 'dirbuster'
 		self.priority = 0
 		self.tags = ['default', 'safe', 'long', 'http']
+		self.tool_choices =['feroxbuster', 'gobuster', 'dirsearch', 'ffuf', 'dirb', 'none',]
+
 
 	def configure(self):
-		self.add_choice_option('tool', default='feroxbuster', choices=['feroxbuster', 'gobuster', 'dirsearch', 'ffuf', 'dirb'], help='The tool to use for directory busting. Default: %(default)s')
+		self.add_choice_option('tool', default='feroxbuster', choices=self.tool_choices, help='The tool to use for directory busting. set to "none" to disable dirbusting. Default: %(default)s')
 		self.add_list_option('wordlist', default=[os.path.join(config['data_dir'], 'wordlists', 'dirbuster.txt')], help='The wordlist(s) to use when directory busting. Separate multiple wordlists with spaces. Default: %(default)s')
 		self.add_option('threads', default=10, help='The number of threads to use when directory busting. Default: %(default)s')
 		self.add_option('ext', default='txt,html,php,asp,aspx,jsp', help='The extensions you wish to fuzz (no dot, comma separated). Default: %(default)s')
@@ -24,8 +26,11 @@ class DirBuster(ServiceScan):
 
 	def check(self):
 		tool = self.get_option('tool')
-		if tool == 'feroxbuster' and which('feroxbuster') is None:
-			self.error('The feroxbuster program could not be found. Make sure it is installed. (On Kali, run: sudo apt install feroxbuster)')
+		if tool == 'none':
+			self.info('dirbuster disabled via "--dirbuster.tool none"')
+			return True
+		elif tool == 'feroxbuster' and which('feroxbuster') is None:
+			self.error('The feroxbuster program could not be found. Make sure it is installed. (On Kali, run: sudo apt install feroxbuster)s')
 			return False
 		elif tool == 'gobuster' and which('gobuster') is None:
 			self.error('The gobuster program could not be found. Make sure it is installed. (On Kali, run: sudo apt install gobuster)')
@@ -41,6 +46,8 @@ class DirBuster(ServiceScan):
 			return False
 
 	async def run(self, service):
+		if self.get_option('tool') == 'none':
+			return
 		dot_extensions = ','.join(['.' + x for x in self.get_option('ext').split(',')])
 		for wordlist in self.get_option('wordlist'):
 			name = os.path.splitext(os.path.basename(wordlist))[0]

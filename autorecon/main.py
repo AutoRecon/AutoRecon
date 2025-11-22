@@ -908,7 +908,6 @@ async def run():
 	parser.add_argument('--version', action='store_true', help='Prints the AutoRecon version and exits.')
 	parser.error = lambda s: fail(s[0].upper() + s[1:])
 	args, unknown = parser.parse_known_args()
-
 	errors = False
 
 	autorecon.argparse = parser
@@ -1011,6 +1010,7 @@ async def run():
 			fail('Plugin ' + plugin.name + ' has a slug (' + plugin.slug + ') with the same name as a tag. Please either change the plugin name or override the slug.')
 		# Add plugin slug to tags.
 		plugin.tags += [plugin.slug]
+		
 
 	if len(autorecon.plugin_types['port']) == 0:
 		unknown_help()
@@ -1098,7 +1098,6 @@ async def run():
 		except toml.decoder.TomlDecodeError:
 			unknown_help()
 			fail('Error: Couldn\'t parse ' + g.name + ' file. Check syntax.')
-
 	other_options = []
 	for key, val in config_toml.items():
 		if key == 'global' and isinstance(val, dict): # Process global plugin options.
@@ -1141,11 +1140,9 @@ async def run():
 	for key, val in config.items():
 		if key not in other_options:
 			autorecon.argparse.set_defaults(**{key: val})
-
 	parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS, help='Show this help message and exit.')
 	parser.error = lambda s: fail(s[0].upper() + s[1:])
 	args = parser.parse_args()
-
 	args_dict = vars(args)
 	for key in args_dict:
 		if key in configurable_keys and args_dict[key] is not None:
@@ -1154,7 +1151,6 @@ async def run():
 				continue
 			config[key] = args_dict[key]
 	autorecon.args = args
-
 	if args.list:
 		type = args.list.lower()
 		if type in ['plugin', 'plugins', 'port', 'ports', 'portscan', 'portscans']:
