@@ -262,15 +262,35 @@ plugin arguments:
   --dirbuster.tool {feroxbuster,gobuster,dirsearch,ffuf,dirb}
                         The tool to use for directory busting. Default: feroxbuster
   --dirbuster.wordlist VALUE [VALUE ...]
-                        The wordlist(s) to use when directory busting. Separate multiple wordlists with spaces. Default:
-                        ['~/.local/share/AutoRecon/wordlists/dirbuster.txt']
+                        The wordlist(s) to use when directory busting. Separate multiple wordlists with spaces. Default: ['/root/.local/share/AutoRecon/wordlists/dirbuster.txt']
   --dirbuster.threads VALUE
                         The number of threads to use when directory busting. Default: 10
   --dirbuster.ext VALUE
                         The extensions you wish to fuzz (no dot, comma separated). Default: txt,html,php,asp,aspx,jsp
+  --dirbuster.recursive
+                        Enables recursive searching (where available). Warning: This may cause significant increases to scan times. Default: False
+  --dirbuster.extras VALUE
+                        Any extra options you wish to pass to the tool when it runs. e.g. --dirbuster.extras='-s 200,301 --discover-backup'
+  --enum4linux.tool {enum4linux-ng,enum4linux}
+                        The tool to use for doing Windows and Samba enumeration. Default: enum4linux-ng
   --onesixtyone.community-strings VALUE
-                        The file containing a list of community strings to try. Default: /usr/share/seclists/Discovery/SNMP/common-snmp-
-                        community-strings-onesixtyone.txt
+                        The file containing a list of community strings to try. Default: /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt
+  --redirect-host-discovery.update-hosts
+                        If set, discovered redirect hostnames will be added to /etc/hosts with the target IP
+  --subdomain-enum.domain VALUE
+                        The domain to use as the base domain (e.g. example.com) for subdomain enumeration. Default: None
+  --subdomain-enum.wordlist VALUE [VALUE ...]
+                        The wordlist(s) to use when enumerating subdomains. Separate multiple wordlists with spaces. Default: ['/usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt']
+  --subdomain-enum.threads VALUE
+                        The number of threads to use when enumerating subdomains. Default: 10
+  --vhost-enum.hostname VALUE
+                        The hostname to use as the base host (e.g. example.com) for virtual host enumeration. Default: None
+  --vhost-enum.wordlist VALUE [VALUE ...]
+                        The wordlist(s) to use when enumerating virtual hosts. Separate multiple wordlists with spaces. Default: ['/usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt']
+  --vhost-enum.threads VALUE
+                        The number of threads to use when enumerating virtual hosts. Default: 10
+  --wpscan.api-token VALUE
+                        An API Token from wpvulndb.com to help search for more vulnerabilities.
 
 global plugin arguments:
   These are optional arguments that can be used by all plugins.
