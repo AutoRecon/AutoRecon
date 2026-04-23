@@ -20,11 +20,11 @@ class AllTCPPortScan(PortScan):
 
 		if target.ports:
 			if target.ports['tcp']:
-				process, stdout, stderr = await target.execute('nmap {nmap_extra} -sV -sC --version-all' + traceroute_os + ' -p ' + target.ports['tcp'] + ' -oN "{scandir}/_full_tcp_nmap.txt" -oX "{scandir}/xml/_full_tcp_nmap.xml" {address}', blocking=False)
+				process, stdout, stderr = await target.execute('nmap {nmap_extra} -sV -sC --version-all' + traceroute_os + ' -p ' + target.ports['tcp'] + ' -oN "{scandir}/' + str(target.address) + '_full_tcp_nmap.txt" -oX "{scandir}/xml/' + str(target.address) + '_full_tcp_nmap.xml" {address}', blocking=False)
 			else:
 				return []
 		else:
-			process, stdout, stderr = await target.execute('nmap {nmap_extra} -sV -sC --version-all' + traceroute_os + ' -p- -oN "{scandir}/_full_tcp_nmap.txt" -oX "{scandir}/xml/_full_tcp_nmap.xml" {address}', blocking=False)
+			process, stdout, stderr = await target.execute('nmap {nmap_extra} -sV -sC --version-all' + traceroute_os + ' -p- -oN "{scandir}/' + str(target.address) + '_full_tcp_nmap.txt" -oX "{scandir}/xml/' + str(target.address) + '_full_tcp_nmap.xml" {address}', blocking=False)
 		services = []
 		while True:
 			line = await stdout.readline()

@@ -77,5 +77,6 @@ config = {
 	'max_plugin_target_instances': None,
 	'max_plugin_global_instances': None,
 	'accessible': False,
-	'verbose': 0
+	'verbose': 0,
+	'imported_nmap_services': None
 }

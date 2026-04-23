@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse, asyncio, importlib.util, inspect, ipaddress, math, os, re, select, shutil, signal, socket, sys, termios, time, traceback, tty
+import xml.etree.ElementTree as ET
 from datetime import datetime
 
 try:
@@ -19,6 +20,87 @@ from autorecon.targets import Target, Service
 
 VERSION = "2.0.36"
 
+def latest_mtime(path):
+	"""Recursively get the latest modification time in a directory."""
+	if not os.path.exists(path):
+		return 0
+	if os.path.isfile(path):
+		return os.path.getmtime(path)
+	latest = os.path.getmtime(path)
+	for root, _, files in os.walk(path):
+		for f in files:
+			fpath = os.path.join(root, f)
+			latest = max(latest, os.path.getmtime(fpath))
+	return latest
+
+def needs_update(src, dst):
+	"""Return True if dst doesn't exist or src contains newer files than dst."""
+	if not os.path.exists(dst):
+		return True
+	return latest_mtime(src) > latest_mtime(dst)
+
+def parse_nmap_xml(xml_file):
+	"""Parse an nmap XML file and return {ip: [(protocol, port, service_name, secure), ...]}."""
+	result = {}
+	try:
+		tree = ET.parse(xml_file)
+		root = tree.getroot()
+	except ET.ParseError as exc:
+		fail('Error parsing nmap XML file "' + xml_file + '": ' + str(exc))
+		return result
+
+	for host in root.findall('host'):
+		status = host.find('status')
+		if status is not None and status.get('state') != 'up':
+			continue
+
+		address = None
+		for addr_elem in host.findall('address'):
+			addrtype = addr_elem.get('addrtype', '')
+			if addrtype in ('ipv4', 'ipv6'):
+				address = addr_elem.get('addr')
+				break
+
+		if address is None:
+			hostnames = host.find('hostnames')
+			if hostnames is not None:
+				for hn in hostnames.findall('hostname'):
+					address = hn.get('name')
+					break
+
+		if address is None:
+			continue
+
+		services = []
+		ports_elem = host.find('ports')
+		if ports_elem is None:
+			continue
+
+		for port_elem in ports_elem.findall('port'):
+			state = port_elem.find('state')
+			if state is None or state.get('state') != 'open':
+				continue
+
+			protocol = port_elem.get('protocol', 'tcp').lower()
+			port_num = int(port_elem.get('portid', 0))
+
+			svc_elem = port_elem.find('service')
+			if svc_elem is not None:
+				name = svc_elem.get('name', 'unknown')
+				tunnel = svc_elem.get('tunnel', '')
+				secure = tunnel in ('ssl', 'tls') or 'ssl' in name or 'tls' in name
+			else:
+				name = 'unknown'
+				secure = False
+
+			services.append((protocol, port_num, name, secure))
+
+		if services:
+			result[address] = services
+
+	return result
+
+# ----------------------- CONFIG DIR -----------------------
 if not os.path.exists(config['config_dir']):
 	shutil.rmtree(config['config_dir'], ignore_errors=True, onerror=None)
 	os.makedirs(config['config_dir'], exist_ok=True)
@@ -33,20 +115,33 @@ else:
 	if not os.path.exists(os.path.join(config['config_dir'], 'VERSION-' + VERSION)):
 		warn('It looks like the config in ' + config['config_dir'] + ' is outdated. Please remove the ' + config['config_dir'] + ' directory and re-run AutoRecon to rebuild it.')
 
+# ----------------------- DATA DIR -----------------------
+plugins_src = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'default-plugins')
+plugins_dst = os.path.join(config['data_dir'], 'plugins')
+
+wordlists_src = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'wordlists')
+wordlists_dst = os.path.join(config['data_dir'], 'wordlists')
+
+version_dir = os.path.join(config['data_dir'], f'VERSION-{VERSION}')
 
 if not os.path.exists(config['data_dir']):
 	shutil.rmtree(config['data_dir'], ignore_errors=True, onerror=None)
 	os.makedirs(config['data_dir'], exist_ok=True)
 	open(os.path.join(config['data_dir'], 'VERSION-' + VERSION), 'a').close()
-	shutil.copytree(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'default-plugins'), os.path.join(config['data_dir'], 'plugins'))
-	shutil.copytree(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'wordlists'), os.path.join(config['data_dir'], 'wordlists'))
+	shutil.copytree(plugins_src, plugins_dst)
+	shutil.copytree(wordlists_src, wordlists_dst)
 else:
-	if not os.path.exists(os.path.join(config['data_dir'], 'plugins')):
-		shutil.copytree(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'default-plugins'), os.path.join(config['data_dir'], 'plugins'))
-	if not os.path.exists(os.path.join(config['data_dir'], 'wordlists')):
-		shutil.copytree(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'wordlists'), os.path.join(config['data_dir'], 'wordlists'))
-	if not os.path.exists(os.path.join(config['data_dir'], 'VERSION-' + VERSION)):
+	develop = False
+	# Copy plugins if develop mode or changes detected
+	if develop or needs_update(plugins_src, plugins_dst):
+		shutil.copytree(plugins_src, plugins_dst, dirs_exist_ok=True)
+	# Copy wordlists if changes detected
+	if needs_update(wordlists_src, wordlists_dst):
+		shutil.copytree(wordlists_src, wordlists_dst, dirs_exist_ok=True)
+	# Warn if version is outdated
+	if not os.path.exists(version_dir):
 		warn('It looks like the plugins in ' + config['data_dir'] + ' are outdated. Please remove the ' + config['data_dir'] + ' directory and re-run AutoRecon to rebuild them.')
+
 
 
 # Saves current terminal settings so we can restore them.
@@ -329,6 +424,7 @@ async def port_scan(plugin, target):
 			target.running_tasks.pop(plugin.slug, None)
 
 		info('Port scan {bblue}' + plugin.name + ' {green}(' + plugin.slug + '){rst} against {byellow}' + target.address + '{rst} finished in ' + elapsed_time, verbosity=2)
+		os.system ('touch ' + os.path.join(target.scandir, '.port_scans', f".{plugin.slug}"))
 		return {'type':'port', 'plugin':plugin, 'result':result}
 
 async def service_scan(plugin, service):
@@ -453,12 +549,13 @@ async def service_scan(plugin, service):
 				service.target.running_tasks.pop(tag, None)
 
 			info('Service scan {bblue}' + plugin.name + ' {green}(' + tag + '){rst} against {byellow}' + service.target.address + '{rst} finished in ' + elapsed_time, verbosity=2)
+			os.system ('touch ' + os.path.join(scandir, '.service_scans', f".{plugin.slug}"))
 			return {'type':'service', 'plugin':plugin, 'result':result}
 
 async def generate_report(plugin, targets):
 	semaphore = autorecon.service_scan_semaphore
 
-	if not config['force_services']:
+	if not config['force_services'] and config.get('imported_nmap_services') is None:
 		semaphore = await get_semaphore(autorecon)
 
 	async with semaphore:
@@ -485,10 +582,11 @@ async def scan_target(target):
 	os.makedirs(scandir, exist_ok=True)
 
 	os.makedirs(os.path.join(scandir, 'xml'), exist_ok=True)
+	os.makedirs(os.path.join(scandir, '.port_scans'), exist_ok=True)
 
 	if not config['only_scans_dir']:
-		exploitdir = os.path.join(basedir, 'exploit')
-		os.makedirs(exploitdir, exist_ok=True)
+		#exploitdir = os.path.join(basedir, 'exploit')
+		#os.makedirs(exploitdir, exist_ok=True)
 
 		lootdir = os.path.join(basedir, 'loot')
 		os.makedirs(lootdir, exist_ok=True)
@@ -496,17 +594,17 @@ async def scan_target(target):
 		reportdir = os.path.join(basedir, 'report')
 		os.makedirs(reportdir, exist_ok=True)
 
-		open(os.path.join(reportdir, 'local.txt'), 'a').close()
-		open(os.path.join(reportdir, 'proof.txt'), 'a').close()
+		#open(os.path.join(reportdir, 'local.txt'), 'a').close()
+		#open(os.path.join(reportdir, 'proof.txt'), 'a').close()
 
-		screenshotdir = os.path.join(reportdir, 'screenshots')
-		os.makedirs(screenshotdir, exist_ok=True)
+		#screenshotdir = os.path.join(reportdir, 'screenshots')
+		#os.makedirs(screenshotdir, exist_ok=True)
 	else:
 		reportdir = scandir
 
 	target.reportdir = reportdir
 
-	pending = []
+	pending = set()
 
 	heartbeat = asyncio.create_task(start_heartbeat(target, period=config['heartbeat']))
 
@@ -515,7 +613,7 @@ async def scan_target(target):
 		forced_services = [x.strip().lower() for x in config['force_services']]
 
 		for forced_service in forced_services:
-			match = re.search('(?P<protocol>(tcp|udp))\/(?P<port>\d+)\/(?P<service>[\w\-]+)(\/(?P<secure>secure|insecure))?', forced_service)
+			match = re.search(r'(?P<protocol>(tcp|udp))/(?P<port>\d+)/(?P<service>[\w\-]+)(/(?P<secure>secure|insecure))?', forced_service)
 			if match:
 				protocol = match.group('protocol')
 				if config['proxychains'] and protocol == 'udp':
@@ -529,15 +627,63 @@ async def scan_target(target):
 				services.append(service)
 
 		if services:
-			pending.append(asyncio.create_task(asyncio.sleep(0)))
+			pending.add(asyncio.create_task(asyncio.sleep(0)))
 		else:
 			error('No services were defined. Please check your service syntax: [tcp|udp]/<port>/<service-name>/[secure|insecure]')
 			heartbeat.cancel()
 			autorecon.errors = True
 			return
+	elif config.get('imported_nmap_services') is not None:
+		imported_services_data = config['imported_nmap_services'].get(target.ip) or config['imported_nmap_services'].get(target.address)
+		if imported_services_data:
+			for (protocol, port_num, name, secure) in imported_services_data:
+				if config['proxychains'] and protocol == 'udp':
+					warn('Service ' + protocol + '/' + str(port_num) + '/' + name + ' uses UDP and --proxychains is enabled. Skipping.')
+					continue
+				svc = Service(protocol, port_num, name, secure)
+				svc.target = target
+				services.append(svc)
+			if services:
+				pending.add(asyncio.create_task(asyncio.sleep(0)))
+			else:
+				warn('No usable services for ' + target.address + ' in imported nmap data (all skipped).')
+				heartbeat.cancel()
+				return
+		else:
+			warn('Target ' + target.address + ' (' + target.ip + ') was not found in the imported nmap XML. Falling back to port scanning.')
+			for plugin in target.autorecon.plugin_types['port']:
+				if config['proxychains'] and plugin.type == 'udp':
+					continue
+				processed_marker = os.path.join(scandir, '.port_scans', f".{plugin.slug}")
+				if os.path.exists(processed_marker):
+					info(f"Port Plugin {plugin.name} ({plugin.slug}) has already been run against {target.address}. Skipping.")
+					continue
+				if config['port_scans'] and plugin.slug in config['port_scans']:
+					matching_tags = True
+					excluded_tags = False
+				else:
+					plugin_tag_set = set(plugin.tags)
+					matching_tags = False
+					for tag_group in target.autorecon.tags:
+						if set(tag_group).issubset(plugin_tag_set):
+							matching_tags = True
+							break
+					excluded_tags = False
+					for tag_group in target.autorecon.excluded_tags:
+						if set(tag_group).issubset(plugin_tag_set):
+							excluded_tags = True
+							break
+				if matching_tags and not excluded_tags:
+					target.scans['ports'][plugin.slug] = {'plugin': plugin, 'commands': []}
+					pending.add(asyncio.create_task(port_scan(plugin, target)))
 	else:
 		for plugin in target.autorecon.plugin_types['port']:
 			if config['proxychains'] and plugin.type == 'udp':
+				continue
+			processed_marker = os.path.join(scandir, '.port_scans', f".{plugin.slug}")
+			# If the plugin has already been run against this target, skip it.
+			if os.path.exists(processed_marker):
+				info(f"Port Plugin {plugin.name} ({plugin.slug}) has already been run against {target.address}. Skipping.")
 				continue
 
 			if config['port_scans'] and plugin.slug in config['port_scans']:
@@ -560,7 +706,7 @@ async def scan_target(target):
 
 			if matching_tags and not excluded_tags:
 				target.scans['ports'][plugin.slug] = {'plugin':plugin, 'commands':[]}
-				pending.append(asyncio.create_task(port_scan(plugin, target)))
+				pending.add(asyncio.create_task(port_scan(plugin, target)))
 
 	async with autorecon.lock:
 		autorecon.scanning_targets.append(target)
@@ -580,7 +726,7 @@ async def scan_target(target):
 				timed_out = True
 				break
 
-		if not config['force_services']:
+		if not config['force_services'] and config.get('imported_nmap_services') is None:
 			# Extract Services
 			services = []
 
@@ -627,6 +773,7 @@ async def scan_target(target):
 				scandir = os.path.join(scandir, protocol + str(port))
 				os.makedirs(scandir, exist_ok=True)
 				os.makedirs(os.path.join(scandir, 'xml'), exist_ok=True)
+				os.makedirs(os.path.join(scandir, '.service_scans'), exist_ok=True)
 
 			# Special cases for HTTP.
 			http_scheme = 'https' if 'https' in service.name or service.secure is True else 'http'
@@ -655,6 +802,13 @@ async def scan_target(target):
 				plugin_was_run = False
 				plugin_service_match = False
 				plugin_tag = service.tag() + '/' + plugin.slug
+
+				processed_marker = os.path.join(scandir, '.service_scans', f".{plugin.slug}")
+				# If the plugin has already been run against this service, skip it.
+				if os.path.exists(processed_marker):
+					info(f"Service Plugin {plugin.name} ({plugin.slug}) has already been run against {service.name} on {target.address}. Skipping.")
+					continue
+
 
 				for service_dict in plugin.services:
 					if service_dict['protocol'] == protocol and port in service_dict['port']:
@@ -901,6 +1055,7 @@ async def run():
 	parser.add_argument('--disable-keyboard-control', action='store_true', help='Disables keyboard control ([s]tatus, Up, Down) if you are in SSH or Docker.')
 	parser.add_argument('--ignore-plugin-checks', action='store_true', help='Ignores errors from plugin check functions that would otherwise prevent AutoRecon from running. Default: %(default)s')
 	parser.add_argument('--force-services', action='store', nargs='+', metavar='SERVICE', help='A space separated list of services in the following style: tcp/80/http tcp/443/https/secure')
+	parser.add_argument('--import-nmap', action='store', type=str, metavar='XML_FILE', help='Import hosts and open ports from an existing nmap XML file and run service scans without port scanning. Targets found in the XML are added automatically unless targets are specified explicitly.')
 	parser.add_argument('-mpti', '--max-plugin-target-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of instances (per target) in the following style: nmap-http:2 dirbuster:1. Default: %(default)s')
 	parser.add_argument('-mpgi', '--max-plugin-global-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of global instances in the following style: nmap-http:2 dirbuster:1. Default: %(default)s')
 	parser.add_argument('--accessible', action='store_true', help='Attempts to make AutoRecon output more accessible to screenreaders. Default: %(default)s')
@@ -1250,7 +1405,7 @@ async def run():
 				mode = 'udp'
 				port = port.split('U:')[1]
 
-			match = re.search('^([0-9]+)\-([0-9]+)$', port)
+			match = re.search(r'^([0-9]+)-([0-9]+)$', port)
 			if match:
 				num1 = int(match.group(1))
 				num2 = int(match.group(2))
@@ -1336,7 +1491,7 @@ async def run():
 		errors = True
 
 	if not errors:
-		if config['force_services']:
+		if config['force_services'] or config.get('imported_nmap_services') is not None:
 			autorecon.service_scan_semaphore = asyncio.Semaphore(config['max_scans'])
 		else:
 			autorecon.port_scan_semaphore = asyncio.Semaphore(config['max_port_scans'])
@@ -1393,6 +1548,21 @@ async def run():
 		except OSError:
 			error('The target file ' + args.target_file + ' could not be read.')
 			sys.exit(1)
+
+	if args.import_nmap:
+		if not os.path.isfile(args.import_nmap):
+			error('The nmap XML file "' + args.import_nmap + '" was not found.')
+			sys.exit(1)
+		imported = parse_nmap_xml(args.import_nmap)
+		if not imported:
+			error('No hosts with open ports found in nmap XML file "' + args.import_nmap + '".')
+			sys.exit(1)
+		config['imported_nmap_services'] = imported
+		info('Imported ' + str(len(imported)) + ' host(s) from "' + args.import_nmap + '".')
+		# When no explicit targets given, use all hosts from the XML.
+		if not raw_targets:
+			for address in imported:
+				raw_targets.append(address)
 
 	unresolvable_targets = False
 	for target in raw_targets:
@@ -1493,7 +1663,7 @@ async def run():
 		error('A total of ' + str(len(autorecon.pending_targets)) + ' targets would be scanned. If this is correct, re-run with the --disable-sanity-checks option to suppress this check.')
 		errors = True
 
-	if not config['force_services']:
+	if not config['force_services'] and config.get('imported_nmap_services') is None:
 		port_scan_plugin_count = 0
 		for plugin in autorecon.plugin_types['port']:
 			if config['port_scans'] and plugin.slug in config['port_scans']:
@@ -1533,10 +1703,10 @@ async def run():
 	if not config['disable_keyboard_control']:
 		terminal_settings = termios.tcgetattr(sys.stdin.fileno())
 
-	pending = []
+	pending = set()
 	i = 0
 	while autorecon.pending_targets:
-		pending.append(asyncio.create_task(scan_target(autorecon.pending_targets.pop(0))))
+		pending.add(asyncio.create_task(scan_target(autorecon.pending_targets.pop(0))))
 		i+=1
 		if i >= num_initial_targets:
 			break
@@ -1572,7 +1742,7 @@ async def run():
 		for targ in autorecon.scanning_targets:
 			for process_list in targ.running_tasks.values():
 				# If we're not scanning ports, count ServiceScans instead.
-				if config['force_services']:
+				if config['force_services'] or config.get('imported_nmap_services') is not None:
 					if issubclass(process_list['plugin'].__class__, ServiceScan): # TODO should we really count ServiceScans? Test...
 						port_scan_task_count += 1
 				else:
