@@ -227,7 +227,7 @@ class AutoRecon(object):
 		self.scanning_targets = []
 		self.completed_targets = []
 		self.plugins = {}
-		self.__slug_regex = re.compile('^[a-z0-9\-]+$')
+		self.__slug_regex = re.compile(r'^[a-z0-9\-]+$')
 		self.plugin_types = {'port':[], 'service':[], 'report':[]}
 		self.port_scan_semaphore = None
 		self.service_scan_semaphore = None
@@ -254,7 +254,7 @@ class AutoRecon(object):
 
 	def extract_service(self, line, regex):
 		if regex is None:
-			regex = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
+			regex = r'^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
 		match = re.search(regex, line)
 		if match:
 			protocol = match.group('protocol').lower()
@@ -364,7 +364,7 @@ class AutoRecon(object):
 
 		process = await asyncio.create_subprocess_shell(
 			cmd,
-			stdin=open('/dev/null'),
+			stdin=open(os.devnull),
 			stdout=asyncio.subprocess.PIPE,
 			stderr=asyncio.subprocess.PIPE)
 
