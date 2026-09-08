@@ -8,7 +8,7 @@ class BruteforceFTP(ServiceScan):
 		self.tags = ['default', 'ftp']
 
 	def configure(self):
-		self.match_service_name(['^ftp', '^ftp\-data'])
+		self.match_service_name(['^ftp', '^ftp\\-data'])
 
 	def manual(self, service, plugin_was_run):
 		service.add_manual_commands('Bruteforce logins:', [

@@ -8,7 +8,7 @@ class NmapMSSQL(ServiceScan):
 		self.tags = ['default', 'safe', 'databases']
 
 	def configure(self):
-		self.match_service_name(['^mssql', '^ms\-sql'])
+		self.match_service_name(['^mssql', '^ms\\-sql'])
 
 	def manual(self, service, plugin_was_run):
 		if service.target.ipversion == 'IPv4':

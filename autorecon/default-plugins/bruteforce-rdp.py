@@ -8,7 +8,7 @@ class BruteforceRDP(ServiceScan):
 		self.tags = ['default', 'rdp']
 
 	def configure(self):
-		self.match_service_name(['^rdp', '^ms\-wbt\-server', '^ms\-term\-serv'])
+		self.match_service_name(['^rdp', '^ms\\-wbt\\-server', '^ms\\-term\\-serv'])
 
 	def manual(self, service, plugin_was_run):
 		service.add_manual_commands('Bruteforce logins:', [

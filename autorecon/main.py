@@ -515,7 +515,7 @@ async def scan_target(target):
 		forced_services = [x.strip().lower() for x in config['force_services']]
 
 		for forced_service in forced_services:
-			match = re.search('(?P<protocol>(tcp|udp))\/(?P<port>\d+)\/(?P<service>[\w\-]+)(\/(?P<secure>secure|insecure))?', forced_service)
+			match = re.search('(?P<protocol>(tcp|udp))\\/(?P<port>\\d+)\\/(?P<service>[\\w\\-]+)(\\/(?P<secure>secure|insecure))?', forced_service)
 			if match:
 				protocol = match.group('protocol')
 				if config['proxychains'] and protocol == 'udp':
@@ -1250,7 +1250,7 @@ async def run():
 				mode = 'udp'
 				port = port.split('U:')[1]
 
-			match = re.search('^([0-9]+)\-([0-9]+)$', port)
+			match = re.search('^([0-9]+)\\-([0-9]+)$', port)
 			if match:
 				num1 = int(match.group(1))
 				num2 = int(match.group(2))

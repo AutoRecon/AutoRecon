@@ -8,7 +8,7 @@ class SMBClient(ServiceScan):
 		self.tags = ['default', 'safe', 'smb', 'active-directory']
 
 	def configure(self):
-		self.match_service_name(['^smb', '^microsoft\-ds', '^netbios'])
+		self.match_service_name(['^smb', '^microsoft\\-ds', '^netbios'])
 		self.match_port('tcp', [139, 445])
 		self.run_once(True)
 
