@@ -10,7 +10,7 @@ class Enum4Linux(ServiceScan):
 
 	def configure(self):
 		self.add_choice_option('tool', default=('enum4linux-ng' if which('enum4linux-ng') else 'enum4linux'), choices=['enum4linux-ng', 'enum4linux'], help='The tool to use for doing Windows and Samba enumeration. Default: %(default)s')
-		self.match_service_name(['^ldap', '^smb', '^microsoft\-ds', '^netbios'])
+		self.match_service_name(['^ldap', '^smb', '^microsoft\\-ds', '^netbios'])
 		self.match_port('tcp', [139, 389, 445])
 		self.match_port('udp', 137)
 		self.run_once(True)

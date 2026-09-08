@@ -8,7 +8,7 @@ class SMBMap(ServiceScan):
 		self.tags = ['default', 'safe', 'smb', 'active-directory']
 
 	def configure(self):
-		self.match_service_name(['^smb', '^microsoft\-ds', '^netbios'])
+		self.match_service_name(['^smb', '^microsoft\\-ds', '^netbios'])
 
 	async def run(self, service):
 		if service.target.ipversion == 'IPv4':

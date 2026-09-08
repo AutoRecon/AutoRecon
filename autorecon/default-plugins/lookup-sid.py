@@ -8,7 +8,7 @@ class LookupSID(ServiceScan):
 		self.tags = ['default', 'safe', 'active-directory']
 
 	def configure(self):
-		self.match_service('tcp', 445, '^microsoft\-ds')
+		self.match_service('tcp', 445, '^microsoft\\-ds')
 
 	def manual(self, service, plugin_was_run):
 		service.add_manual_command('Lookup SIDs', [

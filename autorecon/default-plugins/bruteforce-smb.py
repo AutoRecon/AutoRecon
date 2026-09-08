@@ -8,7 +8,7 @@ class BruteforceSMB(ServiceScan):
 		self.tags = ['default', 'safe', 'active-directory']
 
 	def configure(self):
-		self.match_service('tcp', 445, '^microsoft\-ds')
+		self.match_service('tcp', 445, '^microsoft\\-ds')
 		self.match_service('tcp', 139, '^netbios')
 
 	def manual(self, service, plugin_was_run):

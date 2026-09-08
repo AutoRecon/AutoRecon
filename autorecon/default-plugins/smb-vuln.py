@@ -8,7 +8,7 @@ class SMBVuln(ServiceScan):
 		self.tags = ['unsafe', 'smb', 'active-directory']
 
 	def configure(self):
-		self.match_service_name(['^smb', '^microsoft\-ds', '^netbios'])
+		self.match_service_name(['^smb', '^microsoft\\-ds', '^netbios'])
 
 	async def run(self, service):
 		await service.execute('nmap {nmap_extra} -sV -p {port} --script="smb-vuln-*" --script-args="unsafe=1" -oN "{scandir}/{protocol}_{port}_smb_vulnerabilities.txt" -oX "{scandir}/xml/{protocol}_{port}_smb_vulnerabilities.xml" {address}')

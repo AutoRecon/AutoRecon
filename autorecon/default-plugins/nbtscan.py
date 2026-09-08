@@ -8,7 +8,7 @@ class NBTScan(ServiceScan):
 		self.tags = ['default', 'safe', 'netbios', 'active-directory']
 
 	def configure(self):
-		self.match_service_name(['^smb', '^microsoft\-ds', '^netbios'])
+		self.match_service_name(['^smb', '^microsoft\\-ds', '^netbios'])
 		self.match_port('udp', 137)
 		self.run_once(True)
 
